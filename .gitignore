@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.env.local
+
+# TypeScript incremental build cache — a build artifact, not source.
+tsconfig.tsbuildinfo

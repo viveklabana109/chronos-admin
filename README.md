@@ -215,6 +215,20 @@ npm run build     # -> dist/
 Set `VITE_API_BASE_URL` in the host's build environment — it is baked in at
 build time, not read at runtime.
 
+**Every host needs the SPA rewrite.** Routing is `BrowserRouter`, so `/settings`
+is a path the router resolves in the browser and *not* a file on disk. A static
+host asked for it finds nothing and answers 404 — which shows up as "the app
+works until you refresh, or open a link to anything but `/`". `vercel.json` in
+this repo carries the rewrite for Vercel:
+
+```json
+{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+```
+
+Vercel checks the filesystem first, so this does not swallow `/assets/*`. On
+Netlify the equivalent is a `_redirects` file with `/*  /index.html  200`; on
+Render's static sites it is a rewrite rule of the same shape.
+
 Two things to sort out on the backend side before this is public:
 
 1. **`CHRONOS_ADMIN_AUTH_DISABLED=true` must go.** While it is set, every

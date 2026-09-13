@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chronos Admin</title>
+    <script>
+      // Before first paint, not in React: applying the stored theme after mount
+      // means a viewer who chose dark watches the panel flash white on every
+      // load. Kept inline and tiny for the same reason — it must not wait on a
+      // network request. Mirrors src/lib/theme.ts; change both together.
+      try {
+        var t = localStorage.getItem('chronos.admin.theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

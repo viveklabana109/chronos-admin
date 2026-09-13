@@ -75,44 +75,95 @@
   --shadow-lg: 0 10px 30px rgba(17, 24, 39, 0.14);
 }
 
+/* Dark, three ways round.
+ *
+ * The viewer's theme has three states, not two: an explicit Light, an explicit
+ * Dark, and "follow the system" — which is the default and stamps nothing. So
+ * the dark tokens are declared twice: once behind the media query for the
+ * default state, and once behind the attribute the toggle writes. The media
+ * query is guarded with `:not([data-theme="light"])` so that choosing Light on
+ * a machine set to dark actually wins.
+ *
+ * Never give a colour its only definition inside one of these blocks: `:root`
+ * above has to be complete on its own. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
+  :root:not([data-theme='light']) {
 
-    --bg: #111827;
-    --surface: #1f2937;
-    --surface-2: #273244;
-    --surface-3: #111827;
-    --border: #374151;
-    --border-strong: #4b5563;
-    --divider: rgba(128, 150, 172, 0.2);
+  color-scheme: dark;
 
-    --text: #e5e7eb;
-    --text-strong: #f9fafb;
-    --text-dim: #9ca3af;
-    --text-faint: #9ca3af;
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface-2: #273244;
+  --surface-3: #111827;
+  --border: #374151;
+  --border-strong: #4b5563;
+  --divider: rgba(128, 150, 172, 0.2);
 
-    /* The fill stays put — white on #066fd1 is what a primary button is. Only
-       the ink lightens, because #066fd1 as text on #111827 is unreadable. */
-    --accent: #066fd1;
-    --accent-text: #7cb3ea;
-    --accent-dim: rgba(6, 111, 209, 0.22);
+  --text: #e5e7eb;
+  --text-strong: #f9fafb;
+  --text-dim: #9ca3af;
+  --text-faint: #9ca3af;
 
-    --ok: #46c85f;
-    --ok-dim: rgba(47, 179, 68, 0.16);
-    --warn: #f0b03c;
-    --warn-dim: rgba(245, 159, 0, 0.16);
-    --bad: #f38a8a;
-    --bad-dim: rgba(214, 57, 57, 0.18);
-    --info: #74b4ec;
-    --info-dim: rgba(66, 153, 225, 0.18);
+  /* The fill stays put — white on #066fd1 is what a primary button is. Only
+     the ink lightens, because #066fd1 as text on #111827 is unreadable. */
+  --accent: #066fd1;
+  --accent-text: #7cb3ea;
+  --accent-dim: rgba(6, 111, 209, 0.22);
 
-    --photo-bg: #0b1220;
+  --ok: #46c85f;
+  --ok-dim: rgba(47, 179, 68, 0.16);
+  --warn: #f0b03c;
+  --warn-dim: rgba(245, 159, 0, 0.16);
+  --bad: #f38a8a;
+  --bad-dim: rgba(214, 57, 57, 0.18);
+  --info: #74b4ec;
+  --info-dim: rgba(66, 153, 225, 0.18);
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --photo-bg: #0b1220;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
+}
+
+:root[data-theme='dark'] {
+
+  color-scheme: dark;
+
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface-2: #273244;
+  --surface-3: #111827;
+  --border: #374151;
+  --border-strong: #4b5563;
+  --divider: rgba(128, 150, 172, 0.2);
+
+  --text: #e5e7eb;
+  --text-strong: #f9fafb;
+  --text-dim: #9ca3af;
+  --text-faint: #9ca3af;
+
+  /* The fill stays put — white on #066fd1 is what a primary button is. Only
+     the ink lightens, because #066fd1 as text on #111827 is unreadable. */
+  --accent: #066fd1;
+  --accent-text: #7cb3ea;
+  --accent-dim: rgba(6, 111, 209, 0.22);
+
+  --ok: #46c85f;
+  --ok-dim: rgba(47, 179, 68, 0.16);
+  --warn: #f0b03c;
+  --warn-dim: rgba(245, 159, 0, 0.16);
+  --bad: #f38a8a;
+  --bad-dim: rgba(214, 57, 57, 0.18);
+  --info: #74b4ec;
+  --info-dim: rgba(66, 153, 225, 0.18);
+
+  --photo-bg: #0b1220;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 * { box-sizing: border-box; }
@@ -455,6 +506,43 @@ input[type='checkbox'] { width: auto; box-shadow: none; }
 
 .nav-close { display: none; }
 .nav-scrim { display: none; }
+
+/* Three segments in one pill, the way a settings control reads — not three
+   loose buttons. Sits above the account block so the eye finds it in the same
+   corner every time rather than at the end of a list that changes length. */
+.theme-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+}
+.theme-toggle button {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 5px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  /* Body ink, not muted: --text-dim on the inset track lands at 4.4:1, under AA
+     for 11px. The selected segment is told apart by its raised chip, not by the
+     other two being faint. */
+  color: var(--text);
+  border-radius: 4px;
+}
+.theme-toggle button:hover:not(.active) { background: var(--surface); color: var(--text); }
+/* The selected segment is a raised chip on the inset track — the same figure
+   and ground the rest of the panel uses, so it reads as chosen rather than
+   merely hovered. */
+.theme-toggle button.active {
+  background: var(--surface);
+  color: var(--text-strong);
+  box-shadow: var(--shadow-sm);
+}
+.theme-toggle button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus-ring); }
 
 .sidebar-foot .who { color: var(--text); font-weight: 500; }
 .sidebar-foot .host { word-break: break-all; }

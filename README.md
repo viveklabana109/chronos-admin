@@ -146,8 +146,21 @@ Tabler (tabler.io): its neutral gray ramp, its blue (`#066fd1`), its geometry â€
 surfaces separated by a hairline instead of by shadow. The numbers in
 `styles.css` were read off the live template rather than eyeballed.
 
-Light is the default; dark follows `prefers-color-scheme` and uses Tabler's own
-dark values (`#111827` page, `#1f2937` surfaces, `#374151` borders).
+Light is the default; dark uses Tabler's own values (`#111827` page, `#1f2937`
+surfaces, `#374151` borders).
+
+**Three states, not two.** The toggle in the sidebar foot offers Light, Dark and
+Auto, and Auto is a real answer rather than the absence of one: a machine that
+flips to dark in the evening should take the panel with it, and a two-way switch
+can only freeze someone on one side of that. Auto is stored as the *absence* of
+`data-theme`, so the stylesheet's media query decides and nothing has to watch
+the OS. That is why the dark tokens are declared twice â€” once behind the media
+query, guarded with `:not([data-theme="light"])` so an explicit Light wins on a
+dark machine, and once behind `[data-theme="dark"]`.
+
+The stored choice is applied by a small inline script in `index.html`, before
+first paint. Doing it in React instead means a viewer who chose dark watches the
+panel flash white on every load.
 
 Two things to keep if you retheme it:
 

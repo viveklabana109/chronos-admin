@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import { useAuth, useCan } from '../lib/auth';
 import { PERM } from '../lib/permissions';
 import { apiBaseUrl } from '../lib/api';
+import { applyTheme, readTheme } from '../lib/theme';
+import type { Theme } from '../lib/theme';
 import { useResource } from '../lib/useResource';
 import type { AdminUser } from '../lib/types';
 
@@ -42,6 +44,38 @@ function useQueueCounts(enabled: boolean) {
     (u) => u.providerListing && ['under_review', 'pending'].includes((u.providerListing.status ?? '').toLowerCase()),
   ).length;
   return { kyc, listings };
+}
+
+/**
+ * Light / Dark / System, as three segments rather than a two-way switch.
+ *
+ * A switch has to pick a side for "system", and whichever it picks is wrong for
+ * the person who wanted the other. Three labelled choices also say what the
+ * current state *is*, which a half-lit switch icon never does.
+ */
+function ThemeToggle() {
+  const [theme, setTheme] = useState<Theme>(() => readTheme());
+
+  const choose = (next: Theme) => {
+    applyTheme(next);
+    setTheme(next);
+  };
+
+  return (
+    <div className="theme-toggle" role="group" aria-label="Colour theme">
+      {(['light', 'dark', 'system'] as const).map((option) => (
+        <button
+          key={option}
+          type="button"
+          className={option === theme ? 'active' : undefined}
+          aria-pressed={option === theme}
+          onClick={() => choose(option)}
+        >
+          {option === 'light' ? 'Light' : option === 'dark' ? 'Dark' : 'Auto'}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function Item({ to, label, count }: { to: string; label: string; count?: number }) {
@@ -140,6 +174,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         ) : null}
 
         <div className="sidebar-foot">
+          <ThemeToggle />
           <div className="who">
             {me?.name ?? me?.loginId}{' '}
             {me?.isSuperAdmin ? <span className="badge info">super</span> : null}

@@ -215,6 +215,13 @@ npm run build     # -> dist/
 Set `VITE_API_BASE_URL` in the host's build environment — it is baked in at
 build time, not read at runtime.
 
+**`vercel.json` states the build outright** — framework, build command and
+output directory — rather than leaving them to dashboard detection. A project
+imported without them builds in 36ms, produces nothing, and answers 404 on every
+path including `/`, which reads exactly like a routing problem and is not one.
+Keeping it in the repo means the deployment is reproducible from the source
+rather than from settings only one person can see.
+
 **Every host needs the SPA rewrite.** Routing is `BrowserRouter`, so `/settings`
 is a path the router resolves in the browser and *not* a file on disk. A static
 host asked for it finds nothing and answers 404 — which shows up as "the app

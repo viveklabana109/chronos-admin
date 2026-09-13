@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { api, apiRaw, getToken, setToken } from './api';
+import { SESSION_ENDED, api, apiRaw, getToken, setToken } from './api';
 
 /**
  * Sign-in against the admin store.
@@ -94,6 +94,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Any authenticated request that comes back 401 ends the session, wherever in
+  // the app it was made. Without this the token is gone but `me` is not, so the
+  // panel keeps rendering its sidebar and account name around pages that all
+  // say "Session ended" — which looks like a broken app rather than a sign-out.
+  useEffect(() => {
+    const onEnded = () => setMe(null);
+    window.addEventListener(SESSION_ENDED, onEnded);
+    return () => window.removeEventListener(SESSION_ENDED, onEnded);
   }, []);
 
   const refresh = useCallback(async () => {

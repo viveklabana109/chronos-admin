@@ -213,6 +213,15 @@ themselves.
 - **Identity documents are private.** They are not on the `/files` static mount;
   `GET /admin/identity/files/{id}` streams them to administrators only, with
   `Cache-Control: no-store`.
+- **A 401 signs you out, from anywhere.** `api.ts` clears the token and fires
+  `chronos:session-ended` when a request that carried one comes back 401; the
+  auth context listens and drops `me`, so the app falls back to the sign-in
+  screen. Handled centrally because every screen would otherwise have to
+  remember, and the one that forgets renders the panel's chrome — sidebar,
+  account name, navigation — wrapped around "Session ended, please sign in
+  again", which reads as a broken app rather than a sign-out. Only 401: a 403
+  is a live session being refused one thing, and signing someone out for it
+  would lose them the screen they need.
 - **Writes reload rather than patch local state.** One approval changes the user
   row, the listing row and the account status at once, and re-deriving that in
   the browser is how a panel starts lying about what the server holds.

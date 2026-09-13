@@ -29,6 +29,30 @@ export function setToken(token: string | null) {
   }
 }
 
+/** Fired when a request that carried a token comes back 401. */
+export const SESSION_ENDED = 'chronos:session-ended';
+
+/**
+ * A 401 on an authenticated request means the session is over — expired,
+ * signed out elsewhere, password changed, account suspended. There is nothing
+ * the page can do with that except stop pretending.
+ *
+ * Handled here rather than in each screen because every screen would have to
+ * remember, and the one that forgets shows the panel's chrome — sidebar,
+ * account name, navigation — wrapped around "Session ended, please sign in
+ * again". That reads as a broken app rather than as a sign-out.
+ *
+ * An event rather than a direct call into the auth context, which would make
+ * these two modules import each other. Only 401 does this: a 403 is a live
+ * session being refused one thing (a missing permission, or an account that
+ * must change its password first), and signing someone out for it would lose
+ * them the very screen they need.
+ */
+function endSession() {
+  setToken(null);
+  window.dispatchEvent(new CustomEvent(SESSION_ENDED));
+}
+
 export class ApiError extends Error {
   status: number;
   /** Per-field messages from `ValidationApiError`, when the failure was one. */
@@ -107,6 +131,7 @@ export async function api<T = any>(path: string, options: Options = {}): Promise
     }
   }
 
+  if (response.status === 401 && !anonymous && token) endSession();
   if (!response.ok) throw readError(response.status, parsed);
 
   const root = (parsed ?? {}) as Record<string, any>;
@@ -132,6 +157,7 @@ export async function apiRaw<T = any>(path: string, options: Options = {}): Prom
   }
   const text = await response.text();
   const parsed = text ? JSON.parse(text) : {};
+  if (response.status === 401 && !anonymous && token) endSession();
   if (!response.ok) throw readError(response.status, parsed);
   return parsed as T;
 }

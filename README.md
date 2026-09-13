@@ -212,8 +212,12 @@ Static build, so any host will do (Vercel, Netlify, Render static, S3):
 npm run build     # -> dist/
 ```
 
-Set `VITE_API_BASE_URL` in the host's build environment — it is baked in at
-build time, not read at runtime.
+`VITE_API_BASE_URL` is baked in at build time, not read at runtime. The
+production value lives in `.env.production` in this repo, so the same commit
+builds the same bundle anywhere and a deploy does not depend on a dashboard
+setting only one person can see. Set the variable in the host's build
+environment to override it for one deployment — a real environment variable
+wins over the file.
 
 **`vercel.json` states the build outright** — framework, install command, build
 command and output directory — rather than leaving them to dashboard detection. A project
